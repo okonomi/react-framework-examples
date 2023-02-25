@@ -59,9 +59,9 @@ export default function JokesRoute() {
                 Add your own
             </Link>
           </div>
-        </div>
-        <div className="jokes-outlet">
-          <Outlet />
+          <div className="jokes-outlet">
+            <Outlet />
+          </div>
         </div>
       </main>
     </div>
