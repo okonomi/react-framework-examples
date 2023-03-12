@@ -4,6 +4,7 @@ import { Link, useActionData, useSearchParams } from "@remix-run/react"
 import styleUrl from "~/styles/login.css"
 import { db } from "~/utils/db.server"
 import { badRequest } from "~/utils/request.server"
+import { login } from "~/utils/session.server"
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styleUrl }
@@ -63,12 +64,23 @@ export const action = async ({ request }: ActionArgs) => {
   }
 
   switch (loginType) {
-    case "login":
-      return badRequest({
-        fieldErrors: null,
-        fields,
-        formError: "Not implemented"
-      })
+    case "login": {
+        const user = await login({ username, password })
+        console.log({ user })
+        if (!user) {
+          return badRequest({
+            fieldErrors: null,
+            fields,
+            formError: "Username/Password combination is incorrect"
+          })
+        }
+
+        return badRequest({
+          fieldErrors: null,
+          fields,
+          formError: "Not implemented"
+        })
+      }
     case "register": {
         const userExists = await db.user.findFirst({
           where: { username }
