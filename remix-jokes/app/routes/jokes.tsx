@@ -1,9 +1,10 @@
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 
 import styleUrl from "~/styles/jokes.css"
 import { db } from "~/utils/db.server";
+import { getUser } from "~/utils/session.server";
 
 export const links: LinksFunction = () => {
   return [
@@ -14,13 +15,20 @@ export const links: LinksFunction = () => {
   ]
 }
 
-export const loader = async () => {
+export const loader = async ({ request }: LoaderArgs) => {
+  const jokeListItems = await db.joke.findMany({
+    take: 5,
+    select: { id: true, name: true },
+    orderBy: { createdAt: "desc" },
+  })
+
+  const user = await getUser(request)
+  console.log({ user })
+
+
   return json({
-    jokeListItems: await db.joke.findMany({
-      take: 5,
-      select: { id: true, name: true },
-      orderBy: { createdAt: "desc" },
-    }),
+    jokeListItems,
+    user,
   })
 }
 
